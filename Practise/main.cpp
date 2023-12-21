@@ -40,14 +40,14 @@ class Management {
         cin >> state;
 
         json data;
-        data["task"]["name"] = task;
-        data["task"]["expireDate"]["day"] = expireDate.day;
-        data["task"]["expireDate"]["month"] = expireDate.month;
-        data["task"]["expireDate"]["year"] = expireDate.year;
-        data["task"]["state"] = state;
+        data[task]["name"] = task;
+        data[task]["expireDate"]["day"] = expireDate.day;
+        data[task]["expireDate"]["month"] = expireDate.month;
+        data[task]["expireDate"]["year"] = expireDate.year;
+        data[task]["state"] = state;
 
         // Write the JSON object to a file
-        ofstream file("data.json");
+        ofstream file("data.json", ios::app);
         file << data.dump(4);
         file.close();
 
@@ -65,6 +65,6 @@ int main() {
     Management manageTask;
     manageTask.assignTask();
 
-    manageTask.assignTask();
+    // manageTask.assignTask();
     return 0;
 }

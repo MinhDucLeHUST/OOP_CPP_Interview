@@ -16,3 +16,5 @@ test:
 
 clean:
 	rm -f *.exe
+cleanJson:	
+	rm -f *.json
