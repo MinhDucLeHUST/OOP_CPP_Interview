@@ -51,7 +51,23 @@
     "iomanip": "cpp",
     "valarray": "cpp",
     "stack": "cpp",
-    "csignal": "cpp"
+    "csignal": "cpp",
+    "xiosbase": "cpp",
+    "bit": "cpp",
+    "compare": "cpp",
+    "concepts": "cpp",
+    "ios": "cpp",
+    "ranges": "cpp",
+    "span": "cpp",
+    "xfacet": "cpp",
+    "xlocale": "cpp",
+    "xlocinfo": "cpp",
+    "xlocnum": "cpp",
+    "xmemory": "cpp",
+    "xstddef": "cpp",
+    "xstring": "cpp",
+    "xtr1common": "cpp",
+    "xutility": "cpp"
   },
   "C_Cpp.errorSquiggles": "disabled"
 }

@@ -1,3 +1,12 @@
+/*
+    (ok) đã phát triển xong các tính năng: 1,2,4,6,5
+    (!) ở tính năng 5: chưa fix được lỗi "nhập tên task ko có trong file data"
+        các tính năng cần phát triển thêm: tính năng back lại cái option trước đó, ví dụ từ nhập task => back về MENU
+        phát triển tính năng 3
+        phát triển tính năng thay đổi value của các key trong file json
+        phát triển tính năng: xóa tất cả các task có "status" = "Done"
+*/
+
 #include <cstdlib>
 #include <ctime>
 #include <fstream>
@@ -6,6 +15,7 @@
 #include "iostream"
 #include "nlohmann/json.hpp"
 #include "string"
+#include "vector"
 
 using namespace std;
 
@@ -25,105 +35,144 @@ class Init {
     }
 };
 
+struct Task {
+    string taskName;
+    string expirationDate;
+    string status;
+};
+
 class Management {
    private:
-    string expireDate;
-    string task;
-    string state;
-    json data;
+    int chooseTask;
+    // json dataJson;
 
-   public:
-    Management(string fileName) {
-        cout << "==== Choose number of your action ====" << endl;
-        cout << "\t1. Assign new task\n\t2. Store data\n\t3. Task was resolved\n\t4. List all tasks\n\t5. Remove task\n\t6. Quit" << endl;
-        cin >> chooseTask;
-        // Init init_obj;
-        // string fileName = init_obj.setName();
-        switch (chooseTask) {
-            case 1:
-                assignTask(fileName);
+    vector<Task> vectorData;
+    void storeData(string nameOfFile, const std::vector<Task>& taskList) {
+        cout << "[2] Data saving" << endl;
 
-                break;
-            case 2:
-                for (auto& i : vectorData) {
-                    cout << "1--- Task Name: " << i.taskName << ", Expiration Date: " << i.expirationDate << ", Status: " << i.status << endl;
-                }
-                storeData(fileName, vectorData);
-                break;
-            case 6:
-                exit(0);
-            default:
-                cout << "Error !!!\n";
-                break;
+        json jsonData;
+
+        for (const auto& task : taskList) {
+            json taskData;
+            taskData["taskName"] = task.taskName;
+            taskData["expirationDate"] = task.expirationDate;
+            taskData["status"] = task.status;
+            jsonData.push_back(taskData);
+        }
+
+        ofstream file(nameOfFile);
+        file << jsonData.dump(4);  // Pretty-print with 4 spaces
+        file.close();
+    }
+
+    /*
+        this function in order to check has file existed, get data into this file and put it into vector
+    */
+    void getDataInExistFile(string nameOfFile) {
+        ifstream inputFile(nameOfFile);
+        if (inputFile.good()) {
+            json jsonData;
+            inputFile >> jsonData;
+            for (const auto& task : jsonData) {
+                Task newTask;
+                newTask.taskName = task["taskName"];
+                newTask.expirationDate = task["expirationDate"];
+                newTask.status = task["status"];
+                vectorData.push_back(newTask);
+            }
+            inputFile.close();
         }
     }
 
-    void assignTask() {
-        cout << "Task: ";
-        cin >> task;
+   public:
+    Management(string fileName) {
+        getDataInExistFile(fileName);
+        while (1) {
+            cout << "============ MENU ============" << endl;
+            cout << "\t1. Assign new task\n\t2. Store data\n\t3. Task was resolved\n\t4. List all tasks\n\t5. Remove task\n\t6. Quit" << endl;
+            cout << "---> Enter active (number): ";
+            cin >> chooseTask;
+            switch (chooseTask) {
+                case 1:
+                    assignTask(fileName);
+                    break;
+                case 2:
+                    storeData(fileName, vectorData);
+                    break;
+                case 4:
+                    listAllTasks(fileName);
+                    break;
+                case 5:
+                    removeByTask(fileName);
+                    break;
+                case 6:
+                    exit(0);
+                default:
+                    cout << "\033[1;31mError !!! Please re-enter.\033[0m\n";
+                    break;
+            }
+        }
+    }
+    void assignTask(string nameOfFile) {
+        Task insertTask;
+        cout << "[1] New task: ";
+        cin >> insertTask.taskName;
 
         cout << "Expiration date (dd/mm/yyyy): ";
-        cin >> expireDate;
+        cin >> insertTask.expirationDate;
 
         cout << "List of status: " << endl;
         cout << "\tOpen\n\tHolding\n\tReopen\n\tDone" << endl;
         cout << "Status: ";
-        cin >> state;
+        cin >> insertTask.status;
 
-        data[task]["name"] = task;
-        data[task]["expireDate"] = expireDate;
-        data[task]["state"] = state;
+        vectorData.push_back(insertTask);
     }
-    void removeTask(string taskDelete, string fileJson) {
-        ifstream inputFile(fileJson);
+    void removeByTask(string nameOfFile) {
+        bool flag = false;
+        string taskRemove;
+        cout << "[5] Enter name of task to remove: ";
+        cin >> taskRemove;
+        ifstream input(nameOfFile);
         json jsonData;
-        inputFile >> jsonData;
-        inputFile.close();
+        input >> jsonData;
+        input.close();
 
-        // Remove data based on key
-        string keyToRemove = "age";
-        if (jsonData.find(keyToRemove) != jsonData.end()) {
-            jsonData.erase(keyToRemove);
-            cout << "Key '" << keyToRemove << "' and its associated value have been removed from the JSON." << endl;
-        } else {
-            cout << "Key '" << keyToRemove << "' not found in the JSON." << endl;
+        for (auto it = jsonData.begin(); it != jsonData.end(); ++it) {
+            if (it->at("taskName") == taskRemove) {
+                flag = true;
+                jsonData.erase(it);
+                break;
+            }
+        }
+        if (!flag) {
+            cout << "\033[1;31mError !!! \033[0m Could not find " << taskRemove << " in json's file." << endl;
+            return;
         }
 
-        // Write the updated JSON back to the file
-        ofstream outputFile(fileJson);
-        outputFile << jsonData.dump(4);  // The '4' is for pretty printing
-        outputFile.close();
+        ofstream output(nameOfFile);
+        output << setw(4) << jsonData << endl;
+        output.close();
     }
-    // bool isDoneTask(){
 
-    // }
-    // void listAllTask();
+    void listAllTasks(string nameOfFile) {
+        cout << "[4] List all task" << endl;
+        ifstream input(nameOfFile);
+        json jsonData;
+        input >> jsonData;
+        input.close();
 
-    void storeData(string nameOfFile) {
-        stack<json> dataStack;
-        dataStack.push(data);
-        json jsonArray;
-        while (!dataStack.empty()) {
-            jsonArray.push_back(dataStack.top());
-            cout << "--- " << jsonArray << endl;
-            dataStack.pop();
-        }
-
-        ofstream file(nameOfFile, ios::app);
-        file << jsonArray.dump(4);
-        file.close();
-
-        cout << "=== Data has been stored in data.json ===" << endl;
+        // Display all the data in the JSON file
+        cout << jsonData.dump(4) << endl;
     }
 };
 
 int main() {
-    Management managementObj;
     Init initObj;
-    string nameJson = initObj.setName();
-    managementObj.assignTask();
-    managementObj.assignTask();
-    managementObj.storeData(nameJson);
+    string jsonFile = initObj.setName();
+
+    Management management(jsonFile);
+    // management.assignTask(jsonFile);
 
     return 0;
 }
