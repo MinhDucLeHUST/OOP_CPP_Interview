@@ -33,12 +33,31 @@ class Management {
     json data;
 
    public:
-    // Management() {
-    //     cout << "Choose your action: " << endl;
-    //     cout << "\tAssign new task\n\tRemove task\n\tTask was resolved\n\tList all tasks" << endl;
-    //     cout << "What do you want to do?";
-    //     cin << task;
-    // }
+    Management(string fileName) {
+        cout << "==== Choose number of your action ====" << endl;
+        cout << "\t1. Assign new task\n\t2. Store data\n\t3. Task was resolved\n\t4. List all tasks\n\t5. Remove task\n\t6. Quit" << endl;
+        cin >> chooseTask;
+        // Init init_obj;
+        // string fileName = init_obj.setName();
+        switch (chooseTask) {
+            case 1:
+                assignTask(fileName);
+
+                break;
+            case 2:
+                for (auto& i : vectorData) {
+                    cout << "1--- Task Name: " << i.taskName << ", Expiration Date: " << i.expirationDate << ", Status: " << i.status << endl;
+                }
+                storeData(fileName, vectorData);
+                break;
+            case 6:
+                exit(0);
+            default:
+                cout << "Error !!!\n";
+                break;
+        }
+    }
+
     void assignTask() {
         cout << "Task: ";
         cin >> task;

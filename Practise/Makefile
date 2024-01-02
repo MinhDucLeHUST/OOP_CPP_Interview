@@ -14,6 +14,10 @@ test:
 	@g++ $(CXXFLAGS) -o test test.cpp
 	@./test.exe
 
+runnn:
+	@g++ $(CXXFLAGS) -o runnn runnn.cpp
+	@./runnn.exe
+
 clean:
 	rm -f *.exe
 cleanJson:	

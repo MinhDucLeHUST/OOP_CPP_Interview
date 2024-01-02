@@ -50,7 +50,8 @@
     "map": "cpp",
     "iomanip": "cpp",
     "valarray": "cpp",
-    "stack": "cpp"
+    "stack": "cpp",
+    "csignal": "cpp"
   },
   "C_Cpp.errorSquiggles": "disabled"
 }

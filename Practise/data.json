@@ -1,7 +1,27 @@
 [
     {
-        "expirationDate": "20/01/1998",
-        "status": "Open",
-        "taskName": "study"
+        "expirationDate": "",
+        "status": "",
+        "taskName": "studyC"
+    },
+    {
+        "expirationDate": "",
+        "status": "",
+        "taskName": "studyPython"
+    },
+    {
+        "expirationDate": "",
+        "status": "",
+        "taskName": "studyLG_rule"
+    },
+    {
+        "expirationDate": "",
+        "status": "",
+        "taskName": "study_sth"
+    },
+    {
+        "expirationDate": "02/01/2024",
+        "status": "Holding",
+        "taskName": "studyTestAuto"
     }
 ]
