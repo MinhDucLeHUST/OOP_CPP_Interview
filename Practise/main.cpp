@@ -1,6 +1,7 @@
 /*
     (ok) đã phát triển xong các tính năng: 1,2,4,6,5
-    (!) ở tính năng 5: chưa fix được lỗi "nhập tên task ko có trong file data"
+    (ok) ở tính năng 5: chưa fix được lỗi "nhập tên task ko có trong file data"
+    (ok) phát triển tính năng: nếu nhập sai định dạng option, ví dụ phải nhập số nhưng nhập chữ thì báo sao và nhập lại
         các tính năng cần phát triển thêm: tính năng back lại cái option trước đó, ví dụ từ nhập task => back về MENU
         phát triển tính năng 3
         phát triển tính năng thay đổi value của các key trong file json
@@ -28,7 +29,7 @@ class Init {
    public:
     string setName() {
         string fileJson = "";
-        cout << "Insert name of file: ";
+        cout << "\033[1;32mInsert name of file: \033[0m";
         cin >> fileJson;
         fileJson = fileJson + ".json";
         return fileJson;
@@ -48,7 +49,7 @@ class Management {
 
     vector<Task> vectorData;
     void storeData(string nameOfFile, const std::vector<Task>& taskList) {
-        cout << "[2] Data saving" << endl;
+        cout << "[2] Data was saved" << endl;
 
         json jsonData;
 
@@ -89,9 +90,14 @@ class Management {
         getDataInExistFile(fileName);
         while (1) {
             cout << "============ MENU ============" << endl;
-            cout << "\t1. Assign new task\n\t2. Store data\n\t3. Task was resolved\n\t4. List all tasks\n\t5. Remove task\n\t6. Quit" << endl;
-            cout << "---> Enter active (number): ";
+            cout << "\t\033[33m1.\033[0m Assign new task\n\t\033[33m2.\033[0m Store data\n\t\033[33m3.\033[0m Task was resolved\n\t\033[33m4.\033[0m List all tasks\n\t\033[33m5.\033[0m Remove task\n\t\033[33m6.\033[0m Quit" << endl;
+            cout << "---> Enter active (\033[33mnumber\033[0m): ";
             cin >> chooseTask;
+            // Does the value entered from the keyboard have the format of the variable?
+            if (cin.fail()) {
+                cin.clear();                                                    // Clear the error state
+                cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');  // Clear the input buffer
+            }
             switch (chooseTask) {
                 case 1:
                     assignTask(fileName);
@@ -103,7 +109,7 @@ class Management {
                     listAllTasks(fileName);
                     break;
                 case 5:
-                    removeByTask(fileName);
+                    removeByTask(fileName, false);
                     break;
                 case 6:
                     exit(0);
@@ -128,8 +134,7 @@ class Management {
 
         vectorData.push_back(insertTask);
     }
-    void removeByTask(string nameOfFile) {
-        bool flag = false;
+    void removeByTask(string nameOfFile, bool flag) {
         string taskRemove;
         cout << "[5] Enter name of task to remove: ";
         cin >> taskRemove;
@@ -140,11 +145,12 @@ class Management {
 
         for (auto it = jsonData.begin(); it != jsonData.end(); ++it) {
             if (it->at("taskName") == taskRemove) {
-                flag = true;
+                flag = true;  // enable flag to notice that is exist in json's file
                 jsonData.erase(it);
                 break;
             }
         }
+        // flag to check 'taskRemove' is exist in json's file
         if (!flag) {
             cout << "\033[1;31mError !!! \033[0m Could not find " << taskRemove << " in json's file." << endl;
             return;

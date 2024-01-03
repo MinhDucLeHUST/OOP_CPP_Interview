@@ -1,3 +1,9 @@
+/*
+    đang phát triển các tính năng lưu trữ data, quay ngược lại các bước trước đó, xử lý với files có sẵn hoặc chưa
+*/
+
+#include <dirent.h>
+
 #include <cstdlib>
 #include <ctime>
 #include <fstream>
@@ -7,7 +13,6 @@
 #include "nlohmann/json.hpp"
 #include "string"
 #include "vector"
-
 using namespace std;
 
 using json = nlohmann::json;
@@ -17,13 +22,6 @@ class Init {
     // string nameFile;
 
    public:
-    string setName() {
-        string fileJson = "";
-        cout << "Insert name of file: ";
-        cin >> fileJson;
-        fileJson = fileJson + ".json";
-        return fileJson;
-    }
 };
 
 struct Task {
@@ -35,11 +33,15 @@ struct Task {
 class Management {
    private:
     int chooseTask;
-    // json dataJson;
-
     vector<Task> vectorData;
+
+    bool hasJsonExtension(const char* fileName) {
+        const char* dot = strrchr(fileName, '.');
+        return dot && !strcmp(dot, ".json");
+    }
+
     void storeData(string nameOfFile, const std::vector<Task>& taskList) {
-        cout << "[2] Data saving" << endl;
+        cout << "[2] Data was saved" << endl;
 
         json jsonData;
 
@@ -74,15 +76,78 @@ class Management {
             inputFile.close();
         }
     }
+    string listJson() {
+        string fileNameJson;
+        string folderPath = ".";  // Assuming the code file is in the same directory as the JSON files
+        int countFile = 0;
+        DIR* dir;
+        struct dirent* ent;
+        bool foundJsonFile = false;
+        if ((dir = opendir(folderPath.c_str())) != NULL) {
+            while ((ent = readdir(dir)) != NULL) {
+                if (hasJsonExtension(ent->d_name)) {
+                    countFile++;
+                    foundJsonFile = true;
+                }
+            }
+            closedir(dir);
+        } else {
+            cerr << "Error opening directory" << endl;
+        }
+
+        if (!foundJsonFile) {
+            cout << "There is no Json's file in the folder, you need to create new file to store your data." << endl;
+            fileNameJson = setName();
+        } else {
+            cout << "We have \033[1;32m" << countFile << "\033[0m json's files!" << endl;
+            if ((dir = opendir(folderPath.c_str())) != NULL) {
+                while ((ent = readdir(dir)) != NULL) {
+                    if (hasJsonExtension(ent->d_name)) {
+                        cout << ent->d_name << "\t";
+                        countFile++;
+                        foundJsonFile = true;
+                    }
+                }
+                cout << "\n";
+                closedir(dir);
+            }
+            fileNameJson = setName();
+        }
+        return fileNameJson;
+    }
+    string setName() {
+        string fileJson = "";
+        cout << "\033[1;32mInsert name of file: \033[0m";
+        cin >> fileJson;
+        fileJson = fileJson + ".json";
+        return fileJson;
+    }
+
+    bool isJsonFileExist(string nameJsonFileToCheck) {
+        string folderPath = ".";  // Replace with the actual path to your folder
+        for (const auto& entry : fs::directory_iterator(folderPath)) {
+            if (entry.path().filename() == nameJsonFileToCheck && entry.path().extension() == ".json") {
+                return true;
+            }
+        }
+        return false;
+    }
 
    public:
-    Management(string fileName) {
+    Management() {
+        cout << "\033[1;32mWelcome to my app\033[0m" << endl;
+        string fileName = listJson();
         getDataInExistFile(fileName);
         while (1) {
             cout << "============ MENU ============" << endl;
-            cout << "\t1. Assign new task\n\t2. Store data\n\t3. Task was resolved\n\t4. List all tasks\n\t5. Remove task\n\t6. Quit" << endl;
-            cout << "---> Enter active (number): ";
+            cout << "\t\033[33m1.\033[0m Assign new task\n\t\033[33m2.\033[0m Store data\n\t\033[33m3.\033[0m Edit data\n\t\033[33m4.\033[0m List all tasks\n\t\033[33m5.\033[0m Remove task\n\t\033[33m6.\033[0m Back\n\t\033[33m7.\033[0m Quit" << endl;
+            cout << "---> Enter active (\033[33mnumber\033[0m): ";
             cin >> chooseTask;
+            // Does the value entered from the keyboard have the format of the variable?
+            if (cin.fail()) {
+                cin.clear();                                                    // Clear the error state
+                cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');  // Clear the input buffer
+            }
             switch (chooseTask) {
                 case 1:
                     assignTask(fileName);
@@ -90,13 +155,21 @@ class Management {
                 case 2:
                     storeData(fileName, vectorData);
                     break;
+                case 3:
+                    cout << "nothing to do here" << endl;
+                    break;
                 case 4:
                     listAllTasks(fileName);
+                    // listJson();
                     break;
                 case 5:
-                    removeByTask(fileName);
+                    removeByTask(fileName, false);
                     break;
                 case 6:
+                    vectorData.clear();  // clear data inside of vector
+                    fileName = listJson();
+                    break;
+                case 7:
                     exit(0);
                 default:
                     cout << "\033[1;31mError !!! Please re-enter.\033[0m\n";
@@ -119,8 +192,7 @@ class Management {
 
         vectorData.push_back(insertTask);
     }
-    void removeByTask(string nameOfFile) {
-        bool flag = false;
+    void removeByTask(string nameOfFile, bool flag) {
         string taskRemove;
         cout << "[5] Enter name of task to remove: ";
         cin >> taskRemove;
@@ -131,11 +203,12 @@ class Management {
 
         for (auto it = jsonData.begin(); it != jsonData.end(); ++it) {
             if (it->at("taskName") == taskRemove) {
-                flag = true;
+                flag = true;  // enable flag to notice that is exist in json's file
                 jsonData.erase(it);
                 break;
             }
         }
+        // flag to check 'taskRemove' is exist in json's file
         if (!flag) {
             cout << "\033[1;31mError !!! \033[0m Could not find " << taskRemove << " in json's file." << endl;
             return;
@@ -159,10 +232,7 @@ class Management {
 };
 
 int main() {
-    Init initObj;
-    string jsonFile = initObj.setName();
-
-    Management management(jsonFile);
+    Management management;
     // management.assignTask(jsonFile);
 
     return 0;
