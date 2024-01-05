@@ -67,7 +67,10 @@
     "xstddef": "cpp",
     "xstring": "cpp",
     "xtr1common": "cpp",
-    "xutility": "cpp"
+    "xutility": "cpp",
+    "thread": "cpp",
+    "chrono": "cpp",
+    "ratio": "cpp"
   },
   "C_Cpp.errorSquiggles": "disabled"
 }
