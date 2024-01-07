@@ -57,7 +57,13 @@ int main() {
 
 ## Manager task:
 
-1. Tạo một lớp Task với các thuộc tính như tên công việc, ngày hết hạn, ưu tiên, và trạng thái.
-2. Thực hiện chức năng để thêm công việc mới, xóa công việc, đánh dấu công việc đã hoàn thành, và hiển thị tất cả các công việc.
-3. Lưu trữ các công việc trong một tệp để chúng tồn tại qua các lần chạy của chương trình.
-4. Thực hiện giao diện người dùng cho phép người dùng tương tác với hệ thống quản lý công việc thông qua giao diện dòng lệnh.
+1. Tạo một lớp Task với các thuộc tính như tên công việc, ngày hết hạn và trạng thái.
+2. Thực hiện chức năng:
+
+- tạo ra task mới: tên task là unique
+- xóa công việc: xóa theo tên task, theo status của task hoặc theo ngày (quá khứ/tương lai)
+- thay đổi dữ liệu của task
+- lưu trữ dữ liệu được nhập vào 1 file chỉ định
+- hiển thị 'all task' trong 1 file đc lưu trữ chỉ định
+
+Lưu ý: các case nhập sai cần được phát triển để cảnh báo tới người dùng.

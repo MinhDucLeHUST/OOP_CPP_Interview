@@ -1,5 +1,7 @@
 /*
-    đang lỗi ở func: assignTask, vì đang phát triển tính năng phát triển trùng lặp tên của task
+    phát triển xong các tính năng remove của task [5]
+    còn task 3 chưa làm
+    (!) lỗi => chưa clear hết data ra khỏi vector khi thực thi [5]
 */
 
 #include <dirent.h>
@@ -11,6 +13,7 @@
 
 #include "iostream"
 #include "nlohmann/json.hpp"
+#include "regex"
 #include "string"
 #include "vector"
 using namespace std;
@@ -137,6 +140,17 @@ class Management {
         return fileJson;
     }
 
+    string setDateByFormat() {
+        string dateCin;
+        regex date_regex("\\b(0[1-9]|[12][0-9]|3[01])/(0[1-9]|1[0-2])/\\d{4}\\b");
+
+        do {
+            cout << "Enter date (dd/mm/yyyy) (press 'q' to go back): ";
+            cin >> dateCin;
+        } while (!regex_match(dateCin, date_regex));
+        return dateCin;
+    }
+
    public:
     Management() {
         cout << "\033[1;32mWelcome to my app\033[0m" << endl;
@@ -201,24 +215,30 @@ class Management {
         input.close();
         for (auto it = jsonData.begin(); it != jsonData.end(); ++it) {
             if (it->at("taskName") == insertTask.taskName) {
-                cout << "This task \033[1;31m" << insertTask.taskName << "\033[0m was exist in file, pls re-enter another name" << endl;
-                assignTask(nameOfFile);
+                cout << "Task: \033[1;31m" << insertTask.taskName << "\033[0m was exist in file, pls re-enter another name" << endl;
+                // assignTask(nameOfFile);
+                return;
             }
         }
-        cout << "Expiration date (dd/mm/yyyy): ";
-        cin >> insertTask.expirationDate;
-
+        // cout << "Expiration date (dd/mm/yyyy): ";
+        // cin >> insertTask.expirationDate;
+        insertTask.expirationDate = setDateByFormat();
+        if (insertTask.expirationDate == "q") {
+            return;
+        }
         cout << "List of status: " << endl;
         cout << "\tOpen\n\tHolding\n\tReopen\n\tDone" << endl;
         cout << "Status: ";
         cin >> insertTask.status;
-
+        if (insertTask.status == "q") {
+            return;
+        }
         vectorData.push_back(insertTask);
     }
     void removeByTask(string nameOfFile, bool flag) {
         bool outWhile = false;
         while (1) {
-            cout << "\033[33m[5] \033[0mRemove task inside file (enter '4' to back to Main menu)" << endl;
+            cout << "\033[33m[5] \033[0mRemove task inside file" << endl;
             cout << "\t[5]\033[33m[1] \033[0m Remove by name of task." << endl;
             cout << "\t[5]\033[33m[2] \033[0m Remove by status of task." << endl;
             cout << "\t[5]\033[33m[3] \033[0m Remove by expiry date of task." << endl;
@@ -286,31 +306,43 @@ class Management {
                     break;
                 case 3:
 
-                    cout << "Enter date (dd/mm/yyyy) (press 'q' to go back): ";
-                    cin >> strDel;
-                    cout << "Do you want to delete tasks in the \033[33mpast \033[0m or in the \033[33mfuture \033[0m (past/future): ";
+                    // cout << "Enter date (dd/mm/yyyy) (press 'q' to go back): ";
+                    // cin >> strDel;
+                    strDel = setDateByFormat();
+                    cout << "Do you want to delete tasks in the \033[33mpast \033[0m or in the \033[33mfuture \033[0m (past/future/'q' to back): ";
                     cin >> befOrPast;
                     if (strDel == "q") {
                         removeByTask(nameOfFile, false);
                     }
                     if (befOrPast == "future") {
-                        for (auto it = jsonData.begin(); it != jsonData.end(); ++it) {
+                        // for (auto it = jsonData.begin(); it != jsonData.end(); ++it) {
+                        //     if (compareDates(strDel, it->at("expirationDate"))) {
+                        //         flag = true;  // enable flag to notice that is exist in json's file
+                        //         jsonData.erase(it);
+                        //         break;
+                        //     }
+                        // }
+                        it = jsonData.begin();
+                        while (it != jsonData.end()) {
                             if (compareDates(strDel, it->at("expirationDate"))) {
-                                // if (== strDel) {
-                                flag = true;  // enable flag to notice that is exist in json's file
-                                jsonData.erase(it);
-                                break;
+                                flag = true;
+                                it = jsonData.erase(it);
+                            } else {
+                                ++it;
                             }
                         }
                     } else if (befOrPast == "past") {
-                        for (auto it = jsonData.begin(); it != jsonData.end(); ++it) {
+                        it = jsonData.begin();
+                        while (it != jsonData.end()) {
                             if (!compareDates(strDel, it->at("expirationDate"))) {
-                                // if (== strDel) {
-                                flag = true;  // enable flag to notice that is exist in json's file
-                                jsonData.erase(it);
-                                break;
+                                flag = true;
+                                it = jsonData.erase(it);
+                            } else {
+                                ++it;
                             }
                         }
+                    } else if (befOrPast == "q") {
+                        break;
                     } else {
                         cout << "\033[1;31mInvalid date, pls re-enter\033[0m" << endl;
                         removeByTask(nameOfFile, false);
@@ -318,7 +350,7 @@ class Management {
 
                     // flag to check 'strDel' is exist in json's file
                     if (!flag) {
-                        cout << "Could not find date: \033[1;31m" << strDel << "\033[0m in json's file to remove." << endl;
+                        cout << "Could not find task in " << befOrPast << " of date: \033[1;31m" << strDel << "\033[0m in json's file to remove." << endl;
                         // return;
                     }
                     break;

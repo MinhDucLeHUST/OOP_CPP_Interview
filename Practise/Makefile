@@ -1,8 +1,8 @@
 .PHONY := all build clean
 
-CXXFLAGS = -std=c++17 -IC:/Users/duc5.le/Downloads/json/include
+# CXXFLAGS = -std=c++17 -IC:/Users/duc5.le/Downloads/json/include
 # JSON_LISTER = -IC:/Users/duc5.le/Downloads/Object-Oriented Programming/Practise
-# CXXFLAGS = -std=c++11 -IC:/Users/KCCSHOP.VN/Downloads/json/include
+CXXFLAGS = -std=c++17 -IC:/Users/KCCSHOP.VN/Downloads/json/include
 all: main run
 
 main:
@@ -15,9 +15,9 @@ test:
 	@g++ $(CXXFLAGS) -o test test.cpp
 	@./test.exe
 
-JsonFileLister:
-	@g++ $(CXXFLAGS) -o JsonFileLister JsonFileLister.cpp
-	@./JsonFileLister.exe
+dev:
+	@g++ $(CXXFLAGS) -o dev dev.cpp
+	@./dev.exe
 
 ## at company
 

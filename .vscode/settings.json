@@ -70,7 +70,14 @@
     "xutility": "cpp",
     "thread": "cpp",
     "chrono": "cpp",
-    "ratio": "cpp"
+    "ratio": "cpp",
+    "locale": "cpp",
+    "optional": "cpp",
+    "regex": "cpp",
+    "xlocbuf": "cpp",
+    "xlocmes": "cpp",
+    "xlocmon": "cpp",
+    "xloctime": "cpp"
   },
   "C_Cpp.errorSquiggles": "disabled"
 }
