@@ -1,5 +1,9 @@
 CXX = g++
-CXXFLAGS = -std=c++17 -IC:/Users/duc5.le/Downloads/OOP_CPP/Practise/Library -IC:/Users/duc5.le/Downloads/OOP_CPP/json/include
+# CXXFLAGS = -std=c++17 -IC:/Users/duc5.le/Downloads/OOP_CPP/Practise/Library -IC:/Users/duc5.le/Downloads/OOP_CPP/json/include
+
+# CXXFLAGS = -std=c++17 -I../Library -I../../json/include
+
+CXXFLAGS = -std=c++17 -I../Library -I../../json-develop/include
 
 all: main run
 

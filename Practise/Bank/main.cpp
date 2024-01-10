@@ -9,29 +9,53 @@
 
 using namespace std;
 
+struct IsOk {
+    bool isAccountValid = false;
+    bool isPasswordValid = false;
+};
+
 class BankManage {
    private:
     HandleJson handleJson;
     SignUp signUp;
     string fileName;
-    BankAccount bankAccount;
+    BankAccountStruct bankAccountStruct;
+    string nameOfFile = "./Data/AccountData.json";
 
    public:
-    bool quitWhile = false;
-    BankManage() {
-        fileName = handleJson.setName("./Data/");
-        handleJson.storeDataBankAccount(fileName, handleJson.vectorBankAcc);
-    }
+    IsOk isOk;
     void signIn() {
-        cout << "Enter name of account: ";
-        cin >> bankAccount.account;
-        handleJson.wasValueExist(fileName, bankAccount.account, "account");
-        while (!signUp.isSetPasswordDone(bankAccount.password, 0, 0) && !signUp.isPasswordSame(bankAccount.password, bankAccount.rePassword)) {
+        while (!isOk.isAccountValid) {
+            cout << "Enter name of account: ";
+            cin >> bankAccountStruct.account;
+            if (handleJson.wasValueExist(nameOfFile, bankAccountStruct.account, "account")) {
+                isOk.isAccountValid = true;
+            }
+        }
+        while (!signUp.isSetPasswordDone(bankAccountStruct.password, 0, 0) && !signUp.isPasswordSame(bankAccountStruct.password, bankAccountStruct.rePassword)) {
             cout << "Enter password: ";
-            cin >> bankAccount.password;
+            cin >> bankAccountStruct.password;
 
             cout << "Re-enter password: ";
-            cin >> bankAccount.rePassword;
+            cin >> bankAccountStruct.rePassword;
+        }
+        getDataInExistFile(nameOfFile);
+        handleJson.storeDataBankAccount(nameOfFile, handleJson.vectorBankAcc);
+    }
+
+    void getDataInExistFile(string nameOfFile) {
+        ifstream inputFile(nameOfFile);
+        if (inputFile.good()) {
+            json jsonData;
+            inputFile >> jsonData;
+            for (const auto& task : jsonData) {
+                BankAccountStruct newDataAcc;
+                newDataAcc.account = task["account"];
+                newDataAcc.password = task["password"];
+                newDataAcc.pinCode = task["pinCode"];
+                handleJson.vectorBankAcc.push_back(newDataAcc);
+            }
+            inputFile.close();
         }
     }
 };

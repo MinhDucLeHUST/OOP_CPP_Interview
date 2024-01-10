@@ -20,7 +20,7 @@ void HandleJson::storeDataTask(const string& nameOfFile, const vector<Task>& tas
     file.close();
 }
 
-void HandleJson::storeDataBankAccount(const string& nameOfFile, const vector<BankAccount>& vectorBankAccount) {
+void HandleJson::storeDataBankAccount(const string& nameOfFile, const vector<BankAccountStruct>& vectorBankAccount) {
     json jsonData;
 
     for (const auto& accBank : vectorBankAccount) {

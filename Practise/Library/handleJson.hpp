@@ -17,7 +17,7 @@ struct Task {
     std::string status;
 };
 
-struct BankAccount {
+struct BankAccountStruct {
     string account;
     string password;
     string rePassword;
@@ -28,7 +28,7 @@ class HandleJson {
    protected:
    public:
     vector<Task> vectorData;
-    vector<BankAccount> vectorBankAcc;
+    vector<BankAccountStruct> vectorBankAcc;
     void storeDataTask(const std::string& nameOfFile, const std::vector<Task>& taskList);
     void getDataInExistFile(const std::string& nameOfFile);
     void listAllTasks(string nameOfFile);
@@ -36,7 +36,7 @@ class HandleJson {
     bool hasJsonExtension(const char* fileName);
     string listFileJsonInFolder(string folderPath);
     bool wasValueExist(const string& nameOfFile, const string& valueInsert, const string& keyToCheck);
-    void storeDataBankAccount(const string& nameOfFile, const vector<BankAccount>& vectorBankAccount);
+    void storeDataBankAccount(const string& nameOfFile, const vector<BankAccountStruct>& vectorBankAccount);
 };
 
 #endif
