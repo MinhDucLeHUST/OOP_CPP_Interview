@@ -1,6 +1,7 @@
 /*
     còn task [3] chưa làm
     (!) lỗi => chưa clear hết data ra khỏi vector khi thực thi [5]
+    (!) lỗi => chọn file data có sẵn thì data lưu vào ghi đè data có sẵn.
 */
 
 #include <dirent.h>
@@ -10,6 +11,7 @@
 #include <fstream>
 #include <stack>
 
+#include "handleJson.hpp"
 #include "iostream"
 #include "nlohmann/json.hpp"
 #include "regex"
@@ -19,23 +21,13 @@ using namespace std;
 
 using json = nlohmann::json;
 
-struct Task {
-    string taskName;
-    string expirationDate;
-    string status;
-};
-
 class Management {
    private:
+    HandleJson handleJson;
     int chooseTask;
     string befOrPast;
     int chooseKeyRemove;
     vector<Task> vectorData;
-
-    bool hasJsonExtension(const char* fileName) {
-        const char* dot = strrchr(fileName, '.');
-        return dot && !strcmp(dot, ".json");
-    }
 
     bool compareDates(const string& dateStr1, const string& dateStr2) {
         tm tm1 = {}, tm2 = {};
@@ -48,71 +40,6 @@ class Management {
         time_t t1 = mktime(&tm1);
         time_t t2 = mktime(&tm2);
         return t1 < t2;  // return true if date was insert before date in json
-    }
-
-    /*
-        this function in order to check has file existed, get data into this file and put it into vector
-    */
-    void getDataInExistFile(string nameOfFile) {
-        ifstream inputFile(nameOfFile);
-        if (inputFile.good()) {
-            json jsonData;
-            inputFile >> jsonData;
-            for (const auto& task : jsonData) {
-                Task newTask;
-                newTask.taskName = task["taskName"];
-                newTask.expirationDate = task["expirationDate"];
-                newTask.status = task["status"];
-                vectorData.push_back(newTask);
-            }
-            inputFile.close();
-        }
-    }
-    string listJson() {
-        string fileNameJson;
-        string folderPath = ".";  // Assuming the code file is in the same directory as the JSON files
-        int countFile = 0;
-        DIR* dir;
-        struct dirent* ent;
-        bool foundJsonFile = false;
-        if ((dir = opendir(folderPath.c_str())) != NULL) {
-            while ((ent = readdir(dir)) != NULL) {
-                if (hasJsonExtension(ent->d_name)) {
-                    countFile++;
-                    foundJsonFile = true;
-                }
-            }
-            closedir(dir);
-        } else {
-            cerr << "Error opening directory" << endl;
-        }
-
-        if (!foundJsonFile) {
-            cout << "There is no Json's file in the folder, you need to create new file to store your data." << endl;
-            fileNameJson = setName();
-        } else {
-            cout << "We have \033[1;32m" << countFile << "\033[0m json's files!" << endl;
-            if ((dir = opendir(folderPath.c_str())) != NULL) {
-                while ((ent = readdir(dir)) != NULL) {
-                    if (hasJsonExtension(ent->d_name)) {
-                        cout << ent->d_name << "\t";
-                        countFile++;
-                        foundJsonFile = true;
-                    }
-                }
-                cout << "\n";
-                closedir(dir);
-            }
-            fileNameJson = setName();
-        }
-        return fileNameJson;
-    }
-    string setName() {
-        string fileJson = "";
-        cout << "\033[1;32mInsert name of file: \033[0m";
-        cin >> fileJson;
-        fileJson = fileJson + ".json";
-        return fileJson;
     }
 
     string setDateByFormat() {
@@ -129,8 +56,10 @@ class Management {
    public:
     Management() {
         cout << "\033[1;32mWelcome to my app\033[0m" << endl;
-        string fileName = listJson();
-        getDataInExistFile(fileName);
+
+        string fileName = handleJson.listFileJsonInFolder("./data/");
+        cout << "file: " << fileName << endl;
+        handleJson.getDataInExistFile(fileName);
         while (1) {
             cout << "\033[1;1m============\033[0m \033[1;32mMENU\033[0m \033[1;1m============\033[0m" << endl;
             cout << "\t\033[33m1.\033[0m Assign new task\n\t\033[33m2.\033[0m Store data\n\t\033[33m3.\033[0m Edit data\n\t\033[33m4.\033[0m List all tasks\n\t\033[33m5.\033[0m Remove task\n\t\033[33m6.\033[0m Back\n\t\033[33m7.\033[0m Exit" << endl;
@@ -148,23 +77,23 @@ class Management {
                     break;
                 case 2:
                     cout << "\033[33m[2] \033[0m Saving data" << endl;
-                    storeData(fileName, vectorData);
+                    handleJson.storeDataTask(fileName, vectorData);
                     break;
                 case 3:
                     cout << "nothing to do here" << endl;
                     break;
                 case 4:
-                    listAllTasks(fileName);
+                    cout << "\033[33m[4]\033[0m List all task" << endl;
+                    handleJson.listAllTasks(fileName);
                     break;
                 case 5:
                     removeByTask(fileName, false);
                     break;
                 case 6:
-                    // set condition
                     cout << "\033[33m[6] \033[0mBack" << endl;
                     vectorData.clear();  // clear data inside of vector
-                    fileName = listJson();
-                    getDataInExistFile(fileName);
+                    fileName = handleJson.listFileJsonInFolder("./data/");
+                    handleJson.getDataInExistFile(fileName);
                     break;
                 case 7:
                     cout << "\033[33m[7] \033[0mExit" << endl;
@@ -209,7 +138,6 @@ class Management {
         vectorData.push_back(insertTask);
     }
     void removeByTask(string nameOfFile, bool flag) {
-        bool outWhile = false;
         while (1) {
             cout << "\033[33m[5] \033[0mRemove task inside file" << endl;
             cout << "\t[5]\033[33m[1] \033[0m Remove by name of task." << endl;
@@ -332,37 +260,9 @@ class Management {
             flag = false;
         }
     }
-    void storeData(string nameOfFile, const std::vector<Task>& taskList) {
-        json jsonData;
-
-        for (const auto& task : taskList) {
-            json taskData;
-            taskData["taskName"] = task.taskName;
-            taskData["expirationDate"] = task.expirationDate;
-            taskData["status"] = task.status;
-            jsonData.push_back(taskData);
-        }
-
-        ofstream file(nameOfFile);
-        file << jsonData.dump(4);  // Pretty-print with 4 spaces
-        // cout << "Data was saved" << endl;
-        file.close();
-    }
-    void listAllTasks(string nameOfFile) {
-        cout << "\033[33m[4]\033[0m List all task" << endl;
-        ifstream input(nameOfFile);
-        json jsonData;
-        input >> jsonData;
-        input.close();
-
-        // Display all the data in the JSON file
-        cout << jsonData.dump(4) << endl;
-    }
 };
 
 int main() {
     Management management;
-    // management.assignTask(jsonFile);
-
     return 0;
 }

@@ -1,33 +1,19 @@
-.PHONY := all build clean
+CXX = g++
+CXXFLAGS = -std=c++17 -IC:/Users/duc5.le/Downloads/OOP_CPP/Practise/Library -IC:/Users/duc5.le/Downloads/OOP_CPP/json/include
+LIBS = -L../Library -L../Library -l../Library/handleJson -l../Library/handleJson2
 
-# CXXFLAGS = -std=c++17 -IC:/Users/duc5.le/Downloads/json/include
-# JSON_LISTER = -IC:/Users/duc5.le/Downloads/Object-Oriented Programming/Practise
-CXXFLAGS = -std=c++17 -IC:/Users/KCCSHOP.VN/Downloads/json/include
-all: main run
+all: test run
 
-main:
-	@g++ $(CXXFLAGS) -o main main.cpp
+test: test.o handleJson.o
+	@$(CXX) $(CXXFLAGS) test.o handleJson.o -o test
 
+test.o: test.cpp ../Library/handleJson.hpp
+	@$(CXX) $(CXXFLAGS) -c test.cpp
+
+handleJson.o: ../Library/handleJson.cpp ../Library/handleJson.hpp
+	@$(CXX) $(CXXFLAGS) -c ../Library/handleJson.cpp
 run:
-	@./main.exe
-
-test:
-	@g++ $(CXXFLAGS) -o test test.cpp
 	@./test.exe
-
-dev:
-	@g++ $(CXXFLAGS) -o dev dev.cpp
-	@./dev.exe
-
-## at company
-
-# clean:
-# rm -f *.exe
-# cleanJson:	
-# rm -f *.json
-
-## at home
-
 clean:
-	del *.exe
-	del *.json
+	rm -f *.o
+	rm -f *.exe

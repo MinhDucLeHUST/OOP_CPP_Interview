@@ -11,6 +11,7 @@
 #include <fstream>
 #include <stack>
 
+#include "../Library/handleJson.hpp"
 #include "iostream"
 #include "nlohmann/json.hpp"
 #include "regex"
@@ -58,7 +59,7 @@ class Management {
         return t1 < t2;  // return true if date was insert before date in json
     }
 
-    void storeData(string nameOfFile, const std::vector<Task>& taskList) {
+    void storeDataTask(string nameOfFile, const std::vector<Task>& taskList) {
         json jsonData;
 
         for (const auto& task : taskList) {
@@ -173,7 +174,7 @@ class Management {
                     break;
                 case 2:
                     cout << "\033[33m[2] \033[0m Saving data" << endl;
-                    storeData(fileName, vectorData);
+                    storeDataTask(fileName, vectorData);
                     break;
                 case 3:
                     cout << "nothing to do here" << endl;
