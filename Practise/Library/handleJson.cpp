@@ -20,21 +20,22 @@ void HandleJson::storeDataTask(const string& nameOfFile, const vector<Task>& tas
     file.close();
 }
 
-void HandleJson::storeDataBankAccount(const string& nameOfFile, const vector<BankAccountStruct>& vectorBankAccount) {
-    json jsonData;
+// void HandleJson::storeDataBankAccount(const string& nameOfFile, const vector<StructBankAcc>& vectorBankAccount) {
+//     json jsonData;
 
-    for (const auto& accBank : vectorBankAccount) {
-        json accountData;
-        accountData["account"] = accBank.account;
-        accountData["password"] = accBank.password;
-        accountData["pinCode"] = accBank.pinCode;
-        jsonData.push_back(accountData);
-    }
+//     for (const auto& accBank : vectorBankAccount) {
+//         json accountData;
+//         accountData["account"] = accBank.account;
+//         accountData["password"] = accBank.password;
+//         accountData["pinCode"] = accBank.pinCode;
+//         jsonData.push_back(accountData);
+//     }
 
-    ofstream file(nameOfFile);
-    file << jsonData.dump(4);
-    file.close();
-}
+//     ofstream file(nameOfFile);
+//     file << jsonData.dump(4);
+//     file.close();
+//     cout << "Data saved" << endl;
+// }
 
 /*
     this function in order to check has file existed, get data into this file and put it into vector
