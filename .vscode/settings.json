@@ -83,7 +83,15 @@
     "list": "cpp",
     "unordered_set": "cpp",
     "set": "cpp",
-    "mutex": "cpp"
+    "mutex": "cpp",
+    "format": "cpp",
+    "charconv": "cpp",
+    "filesystem": "cpp",
+    "stop_token": "cpp",
+    "variant": "cpp",
+    "xhash": "cpp",
+    "xtree": "cpp"
   },
-  "C_Cpp.errorSquiggles": "disabled"
+  "C_Cpp.errorSquiggles": "disabled",
+  "cmake.configureOnOpen": false
 }

@@ -1,7 +1,9 @@
 CXX = g++
 
-CXXFLAGS = -std=c++17 -I../Library -I../../json-develop/include
+CXXFLAGS = -std=c++17 -I../Library -IC:/Users/KCCSHOP.VN/Downloads/json/include
 # CXXFLAGS = -std=c++17 -IC:/Users/duc5.le/Downloads/json/include
+
+
 
 all: main run
 
@@ -19,9 +21,9 @@ signUp.o: ../Library/signUp.cpp ../Library/signUp.hpp
 
 run:
 	@./main.exe
-clean:
-	del *.o
-	del *.exe
+# clean:
+# del *.o
+# del *.exe
 
 test:
 	@g++ $(CXXFLAGS) -o test test.cpp
